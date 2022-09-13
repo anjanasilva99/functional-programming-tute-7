@@ -1,45 +1,49 @@
 object Q4 extends App{
-  var acc1= new Account("20000001v",100000100,100000.00);
-  var acc2= new Account("20000002v",100000101,250000.00);
-  var acc3= new Account("20000003v",100000102,-5000.40);
-  var acc4= new Account("20000004v",100000100,10080.50);
-  var acc5= new Account("20000005v",10000101,250400.00);
-  var acc6= new Account("20000006v",100000102,74500.75);
-  var acc7= new Account("20000007v",100000100,-10060.00);
-  var acc8= new Account("20000008v",100000101,250800.40);
+  // Get negative balance list
+  val getNegativeBalance = (b: List[bankAccount]) => b.filter(x => x.balance<0)
+  // Cal total of all accounts balance
+  val calSum = (b: List[bankAccount]) => b.reduce((x,y) => new bankAccount ((x.balance+y.balance),12345678))
+  // Cal and add interest to the balance
+  val calInterest = (b: List[bankAccount]) => b.map(x => new bankAccount(x.addInterest,x.num))
 
-  var bank:List[Account] = List(acc1,acc2,acc3,acc4,acc5,acc6,acc7,acc8)
+  val acc1 = new bankAccount(3000,11001001)
+  val acc2 = new bankAccount(-1500,11001002)
+  val acc3 = new bankAccount(1600,11001003)
+  val acc4 = new bankAccount(-3100,11001004)
+  val acc5 = new bankAccount(5300,11001005)
+  val acc6 = new bankAccount(8200,11001006)
 
-  println("Acount with negative balance : ");
-  val negativeBalance = (b:List[Account]) => b.filter(x => x.balance < 0)
-  var negativeBalance_list = negativeBalance(bank)
-  negativeBalance_list.foreach(x=>println("["+ x.acnumber+": "+x.balance+"]"))
+  // Create a bank as a list of accounts
+  var bank: List[bankAccount] = List (acc1,acc2,acc3,acc4,acc5,acc6)
 
-  val sum = (b:List[Account]) => b.reduce((x,y)=>new Account("null",1111111111,x.balance+y.balance))
-  var sumOfBalance = sum(bank)
-  println("\n" + "Sum of all accounts balances : "+ sumOfBalance.balance)
+  val negativeList = getNegativeBalance(bank)
+  val sum = calSum(bank)
+  val interest = calInterest(bank)
 
-  println("\nFinal Account balances with interest : ")
-  val interest = (b:List[Account]) => b.map(x=>new Account(x.nic,x.acnumber,(if(x.balance>=0) x.balance*1.05d else x.balance*1.10d)))
-  var interest_list = interest(bank)
-  interest_list.foreach(x=>println("["+x.acnumber+": "+x.balance+"]"))
+  println("Acount wich have negative balance : ")
+  println("\tAccount Number\t  Balance")
+  negativeList.foreach(x => println("\t"+x.num+"\t = "+x.balance))
+  println()
+
+  println("Total of all account balances : "+sum.balance)
+  println()
+
+  println("Final balances of all accounts after adding interest : ")
+  println("\tAccount Number\t  Balance")
+  interest.foreach(x => println("\t"+ x.num+"\t= "+x.balance))
+
 }
 
-class Account(id:String, n:Int, b:Double){
+class bankAccount(depamount: Float, accno: Int){
 
-  var nic:String = id
-  var acnumber:Int = n
-  var balance:Double = b
+  var balance = depamount
+  var num = accno
 
-  override def toString = "["+nic+":"+acnumber +":"+balance+"]"
-
-  def withdraw(x:Double) = if(x<=balance)this.balance = this.balance - x else println("Insufficent balance!")
-
-  def deposit(a:Double) = this.balance = this. balance + a
-
-  def transfer(account:Account, amount:Double) = {
-    this.withdraw(amount)
-    account.deposit(amount)
+  def addInterest ={
+    balance match{
+      case x if x >0 => this.balance + this.balance*0.05f
+      case x if x<0 =>  this.balance + this.balance*0.1f
+    }
   }
-
 }
+
